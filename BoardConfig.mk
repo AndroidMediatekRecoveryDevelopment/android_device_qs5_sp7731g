@@ -1,0 +1,80 @@
+DEVICE_PATH := device/QS5/sp7731g
+
+USE_CAMERA_STUB := true
+
+# inherit from the proprietary version
+-include vendor/QS5/sp7731g/BoardConfigVendor.mk
+
+TARGET_ARCH := arm
+TARGET_NO_BOOTLOADER := true
+TARGET_BOARD_PLATFORM := sc8830
+TARGET_CPU_ABI := armeabi-v7a
+TARGET_CPU_ABI2 := armeabi
+TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_CPU_VARIANT := cortex-a7
+TARGET_CPU_SMP := true
+ARCH_ARM_HAVE_TLS_REGISTER := true
+
+TARGET_BOOTLOADER_BOARD_NAME := sc8830
+
+BOARD_KERNEL_CMDLINE := console=ttyS1,115200n8
+BOARD_KERNEL_BASE := 0x00000000
+BOARD_KERNEL_PAGESIZE := 2048
+TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel
+
+#TARGET_RECOVERY_INITRC := device/QS5/sp7731g/recovery/root/init.rc
+#TARGET_RECOVERY_FSTAB := device/QS5/sp7731g/recovery.fstab
+
+#DEVICE_SCREEN_WIDTH := 480
+#DEVICE_SCREEN_HEIGHT := 800
+
+#Boot
+#BOARD_CUSTOM_BOOTIMG_MK := $(DEVICE_PATH)/boot.mk
+BOARD_MKBOOTIMG_ARGS := --dt $(DEVICE_PATH)/dt.img --kernel_offset 0x00008000 --ramdisk_offset 0x01000000 --tags_offset 0x00000100
+
+# Partition sizes
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 20971520
+BOARD_FLASH_BLOCK_SIZE := 131072
+
+# Recovery
+TARGET_USERIMAGES_USE_EXT4 := true
+BOARD_HAS_NO_SELECT_BUTTON := true
+TARGET_RECOVERY_LCD_BACKLIGHT_PATH := /sys/class/leds/lcd-backlight/brightness
+
+RECOVERY_VARIANT := cwm
+
+ifneq ($(RECOVERY_VARIANT),carliv)
+TARGET_RECOVERY_FSTAB := device/QS5/sp7731g/recovery.fstab
+endif
+
+# CARLIV
+ifeq ($(RECOVERY_VARIANT),carliv)
+DEVICE_RESOLUTION := 480x800
+endif
+
+
+# PHILZ
+ifeq ($(RECOVERY_VARIANT),philz)
+TARGET_COMMON_NAME := QS5 sp7731g
+BOARD_USE_NTFS_3G := false
+BRIGHTNESS_SYS_FILE := "/sys/class/leds/lcd-backlight/brightness"
+TARGET_USE_CUSTOM_LUN_FILE_PATH := "/sys/devices/platform/mt_usb/musb-hdrc.0/gadget/lun%d/file"
+TARGET_SCREEN_HEIGHT := 800
+TARGET_SCREEN_WIDTH := 480
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
+endif
+
+# TWRP
+ifeq ($(RECOVERY_VARIANT),twrp)
+TW_NO_EXFAT := true
+TWHAVE_SELINUX := true
+TW_NO_EXFAT_FUSE := true
+TW_THEME := portrait_mdpi
+#RECOVERY_SDCARD_ON_DATA := true
+TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID := true
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
+TARGET_RECOVERY_PIXEL_FORMAT := "RGB_565"
+DEVICE_RESOLUTION := 480x800
+TW_EXCLUDE_SUPERSU := true
+TW_MAX_BRIGHTNESS := 255
+endif
